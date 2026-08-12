@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
+    <title>Support Chats — Admin</title>
+
+    <style>
+        button, a[href]{transition:transform .16s ease,box-shadow .16s ease,background-color .16s ease,border-color .16s ease,filter .16s ease;}
+        button:not(:disabled):hover, a[href]:hover{transform:translateY(-1px);}
+        button:not(:disabled):active, a[href].is-pressed{transform:translateY(1px);filter:brightness(.96);}
+        button:focus-visible, a[href]:focus-visible{outline:3px solid #8fb4ff;outline-offset:3px;}
+        *{
+            box-sizing:border-box;
+            margin:0;
+            padding:0;
+        }
+
+        body{
+            font-family:ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+            background:#f6f7fb;
+            color:#111827;
+            min-height:100vh;
+        }
+
+        header{
+            background:#fff;
+            border-bottom:1px solid #e5e7eb;
+            padding:14px 24px;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            flex-wrap:wrap;
+            gap:8px;
+        }
+
+        .badge{
+            display:inline-block;
+            background:#f3f4f6;
+            border:1px solid #e5e7eb;
+            color:#6b7280;
+            font-size:11px;
+            padding:0.15rem 0.6rem;
+            border-radius:999px;
+            margin-left:8px;
+            text-transform:uppercase;
+        }
+
+        .nav{
+            display:flex;
+            align-items:center;
+            gap:12px;
+        }
+
+        .nav a{
+            font-size:13px;
+            color:#6b7280;
+            text-decoration:none;
+        }
+
+        .nav a:hover{
+            color:#111827;
+        }
+
+        .return-link{
+            border:1px solid rgba(255,255,255,.24);
+            background:rgba(255,255,255,.08);
+            color:#fff;
+            border-radius:7px;
+            padding:0.3rem 0.8rem;
+            font-weight:600;
+            display:inline-flex;
+            align-items:center;
+            margin-top:8px;
+            text-decoration:none;
+            font-size:13px;
+        }
+
+        .return-link:hover{
+            background:rgba(255,255,255,.16);
+            color:#fff;
+        }
+
+        .return-bar{
+            max-width:960px;
+            margin:0 auto;
+            padding:14px 1rem 0;
+        }
+
+        .return-bar .return-link{
+            margin-top:0;
+            background:#fff;
+            border-color:#cbd7e7;
+            color:#21456e;
+        }
+
+        .return-bar .return-link:hover{
+            background:#edf4ff;
+            color:#173b65;
+        }
+
+        .nav .logout{
+            background:#f3f4f6;
+            border:1px solid #e5e7eb;
+            padding:0.3rem 0.8rem;
+            border-radius:7px;
+            color:#374151;
+            cursor:pointer;
+            font:inherit;
+        }
+
+        .nav form{
+            margin:0;
+        }
+
+        .container{
+            max-width:960px;
+            margin:2rem auto;
+            padding:0 1rem;
+            display:grid;
+            grid-template-columns:210px 1fr;
+            gap:1rem;
+            align-items:start;
+        }
+
+        .sidebar{
+            background:#fff;
+            border:1px solid #e5e7eb;
+            border-radius:14px;
+            padding:1rem;
+            box-shadow:0 1px 2px rgba(0,0,0,0.04);
+        }
+
+        .sidebar h3{
+            font-size:11px;
+            color:#9ca3af;
+            text-transform:uppercase;
+            letter-spacing:0.5px;
+            margin-bottom:0.7rem;
+        }
+
+        .user-btn{
+            display:block;
+            width:100%;
+            text-align:left;
+            background:none;
+            border:none;
+            color:#374151;
+            font-size:13px;
+            padding:0.5rem 0.6rem;
+            border-radius:8px;
+            cursor:pointer;
+            transition:background 0.15s;
+            margin-bottom:3px;
+            font-family:inherit;
+        }
+
+        .user-btn:hover{
+            background:#f3f4f6;
+        }
+
+        .user-btn.active{
+            background:#111827;
+            color:#fff;
+        }
+
+        .user-btn.active .email{
+            color:#9ca3af;
+        }
+
+        .user-btn .email{
+            display:block;
+            margin-top:1px;
+            font-size:11px;
+            color:#9ca3af;
+        }
+
+        .no-users{
+            color:#9ca3af;
+            font-size:13px;
+            text-align:center;
+            padding:0.8rem 0;
+        }
+
+        .card{
+            background:#fff;
+            border:1px solid #e5e7eb;
+            border-radius:14px;
+            padding:1.5rem;
+            display:flex;
+            flex-direction:column;
+            box-shadow:0 1px 2px rgba(0,0,0,0.04);
+        }
+
+        .chat-header{
+            margin-bottom:1rem;
+            padding-bottom:0.8rem;
+            border-bottom:1px solid #f3f4f6;
+        }
+
+        .chat-header h2{
+            font-size:15px;
+            font-weight:700;
+            color:#111827;
+        }
+
+        .chat-sub{
+            font-size:12px;
+            color:#9ca3af;
+            margin-top:2px;
+        }
+
+        .chat-box{
+            min-height:320px;
+            max-height:420px;
+            overflow-y:auto;
+            display:flex;
+            flex-direction:column;
+            gap:8px;
+            margin-bottom:1rem;
+            padding:4px 2px;
+        }
+
+        .chat-box::-webkit-scrollbar{
+            width:4px;
+        }
+
+        .chat-box::-webkit-scrollbar-thumb{
+            background:#d1d5db;
+            border-radius:4px;
+        }
+
+        .bubble{
+            max-width:72%;
+            padding:0.55rem 0.9rem;
+            border-radius:12px;
+            font-size:13px;
+            line-height:1.55;
+            word-break:break-word;
+        }
+
+        .bubble.user{
+            background:#f3f4f6;
+            color:#111827;
+            align-self:flex-start;
+            border-bottom-left-radius:3px;
+            border:1px solid #e5e7eb;
+        }
+
+        .bubble.admin{
+            background:#111827;
+            color:#fff;
+            align-self:flex-end;
+            border-bottom-right-radius:3px;
+        }
+
+        .bubble .meta{
+            font-size:11px;
+            margin-top:4px;
+            opacity:0.6;
+        }
+
+        .chat-empty{
+            text-align:center;
+            color:#9ca3af;
+            font-size:13px;
+            padding:2rem 0;
+            margin:auto;
+        }
+
+        .reply-row{
+            display:flex;
+            gap:8px;
+            border-top:1px solid #f3f4f6;
+            padding-top:1rem;
+        }
+
+        textarea{
+            flex:1;
+            border:1px solid #d1d5db;
+            border-radius:8px;
+            padding:0.6rem 0.8rem;
+            font-size:13px;
+            resize:none;
+            height:44px;
+            outline:none;
+            font-family:inherit;
+            background:#fafafa;
+            transition:border-color 0.15s;
+            color:#111827;
+        }
+
+        textarea:focus{
+            border-color:#111827;
+            background:#fff;
+        }
+
+        .btn-send{
+            background:#111827;
+            color:#fff;
+            border:none;
+            border-radius:8px;
+            padding:0 1.2rem;
+            font-size:13px;
+            font-weight:600;
+            cursor:pointer;
+            white-space:nowrap;
+            transition:background 0.15s;
+        }
+
+        .btn-send:hover{
+            background:#1f2937;
+        }
+
+        .btn-send:disabled{
+            opacity:0.5;
+            cursor:not-allowed;
+        }
+
+        .no-select-msg{
+            text-align:center;
+            color:#9ca3af;
+            font-size:13px;
+            padding:3rem 0;
+        }
+
+        .chat-status{
+            min-height:18px;
+            margin-top:8px;
+            color:#6b7280;
+            font-size:12px;
+        }
+
+        .chat-status.error{
+            color:#b42318;
+        }
+
+        .sr-only{
+            position:absolute;
+            width:1px;
+            height:1px;
+            padding:0;
+            margin:-1px;
+            overflow:hidden;
+            clip:rect(0, 0, 0, 0);
+            white-space:nowrap;
+            border:0;
+        }
+
+        /* Match the shared user/guest support-chat visual language. */
+        body{background:#f4f7fb;color:#172033;}
+        header{background:#10243e;border-bottom:0;color:#fff;padding:16px 24px;}
+        .badge{border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.1);color:#dbeafe;}
+        .nav a{color:#dbe7f5;}
+        .nav a:hover{color:#fff;}
+        .nav .logout{border-color:rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;}
+        .sidebar,.card{border-color:#e2e8f0;border-radius:17px;box-shadow:0 12px 30px rgba(23,32,51,.06);}
+        .sidebar h3{color:#667085;}
+        .user-btn:hover{background:#eef4ff;}
+        .user-btn.active{background:#2563eb;color:#fff;}
+        .user-btn.active .email{color:#dbeafe;}
+        .chat-header h2{font-size:18px;color:#172033;}
+        .chat-sub{color:#667085;}
+        .bubble.user{background:#f3f6fa;border-color:#e2e8f0;}
+        .bubble.admin{background:#10243e;}
+        .btn-send{background:#2563eb;}
+        .btn-send:hover{background:#1d4ed8;}
+        textarea:focus{border-color:#2563eb;}
+
+        @media (max-width:760px){
+            header{
+                align-items:flex-start;
+                padding:12px 16px;
+            }
+
+            .nav{
+                width:100%;
+                justify-content:space-between;
+                gap:8px;
+            }
+
+            .nav a,
+            .nav .logout{
+                min-height:44px;
+                display:inline-flex;
+                align-items:center;
+            }
+
+            .container{
+                margin:1rem auto;
+                padding:0 0.75rem;
+                grid-template-columns:1fr;
+            }
+
+            .sidebar{
+                padding:0.8rem;
+                overflow-x:auto;
+            }
+
+            .sidebar h3{
+                position:sticky;
+                left:0;
+            }
+
+            .sidebar > div:not(.no-users){
+                min-width:max-content;
+            }
+
+            .user-btn{
+                width:auto;
+                min-width:150px;
+                min-height:44px;
+                display:inline-block;
+                margin:0 4px 0 0;
+            }
+
+            .card{
+                min-width:0;
+                padding:1rem;
+                border-radius:12px;
+            }
+
+            .chat-box{
+                min-height:260px;
+                height:clamp(260px, 48vh, 420px);
+            }
+
+            .bubble{
+                max-width:88%;
+            }
+
+            textarea{
+                min-height:44px;
+                font-size:16px;
+            }
+
+            .btn-send{
+                min-height:44px;
+            }
+        }
+
+        @media (max-width:420px){
+            .badge{
+                display:block;
+                width:max-content;
+                margin:5px 0 0;
+            }
+
+            .reply-row{
+                flex-direction:column;
+            }
+
+            .btn-send{
+                width:100%;
+                padding:0.7rem 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div>
+            <span style="font-size:18px; font-weight:700;">
+                Emotion Recognition System
+            </span>
+            <span class="badge">Admin</span>
+        </div>
+
+        <div class="nav">
+            <form action="/admin/logout" method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <button type="submit" class="logout">Log out</button>
+            </form>
+        </div>
+    </header>
+
+    <div class="return-bar">
+        <a class="return-link" href="/admin/dashboard">← Return to Dashboard</a>
+    </div>
+
+    <div class="container">
+
+        <div class="sidebar">
+            <h3>Users with chats</h3>
+
+            {% if chat_users %}
+                {% for cu in chat_users %}
+                    <button
+                        class="user-btn {% if loop.first %}active{% endif %}"
+                        type="button"
+                        data-uid="{{ cu.user_id }}"
+                        data-kind="user"
+                        data-name="{{ cu.name }}"
+                        data-email="{{ cu.email }}"
+                        aria-pressed="{{ 'true' if loop.first else 'false' }}">
+
+                        {{ cu.name }}
+                        <span class="email">{{ cu.email }}</span>
+                    </button>
+                {% endfor %}
+            {% else %}
+                <div class="no-users">No chats yet.</div>
+            {% endif %}
+
+            <h3 style="margin-top:1rem;">Guest feedback</h3>
+            {% if guest_chats %}
+                {% for guest in guest_chats %}
+                    <button class="user-btn" type="button" data-kind="guest" data-token="{{ guest.guest_token }}" data-name="{{ guest.guest_name or 'Guest' }}" data-email="Guest feedback" aria-pressed="false">
+                        {{ guest.guest_name or 'Guest' }}
+                        <span class="email">Guest · {{ guest.message_count }} message{{ '' if guest.message_count == 1 else 's' }}</span>
+                    </button>
+                {% endfor %}
+            {% else %}
+                <div class="no-users">No guest feedback yet.</div>
+            {% endif %}
+        </div>
+
+        <div class="card">
+
+            {% if chat_users or guest_chats %}
+
+                <div
+                    id="chatData"
+                    data-kind="{{ 'user' if chat_users else 'guest' }}"
+                    data-id="{{ chat_users[0].user_id if chat_users else guest_chats[0].guest_token }}"
+                    data-name="{{ chat_users[0].name if chat_users else guest_chats[0].guest_name }}"
+                    data-email="{{ chat_users[0].email if chat_users else 'Guest feedback' }}"
+                    style="display:none;">
+                </div>
+
+                <div class="chat-header">
+                    <h2 id="chatTitle">{{ chat_users[0].name if chat_users else guest_chats[0].guest_name }}</h2>
+                    <div class="chat-sub" id="chatSub">
+                        {{ chat_users[0].email if chat_users else 'Guest feedback' }}
+                    </div>
+                </div>
+
+                <div class="chat-box" id="chatBox" role="log" aria-live="polite" aria-relevant="additions text">
+                    <div class="chat-empty">Loading…</div>
+                </div>
+
+                <form class="reply-row" id="replyForm" action="/admin/support/reply" method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <input type="hidden" name="user_id" id="replyUserId" value="{{ chat_users[0].user_id if chat_users else '' }}" />
+                    <label class="sr-only" for="replyInput">Reply to selected user</label>
+                    <textarea
+                        id="replyInput"
+                        name="message"
+                        maxlength="2000"
+                        placeholder="Type your reply… (Enter to send)"
+                        aria-describedby="chatStatus"
+                        required></textarea>
+
+                    <button class="btn-send" id="sendBtn" type="submit">
+                        Send
+                    </button>
+                </form>
+                <p class="chat-status{% if load_error %} error{% endif %}" id="chatStatus" role="status" aria-live="polite">{{ load_error or '' }}</p>
+
+            {% else %}
+
+                <div class="no-select-msg"{% if load_error %} role="alert"{% endif %}>
+                    {{ load_error or 'No support messages yet.' }}
+                </div>
+
+            {% endif %}
+
+        </div>
+    </div>
+
+    <script>
+        const chatData = document.getElementById('chatData');
+
+        let currentConversation = chatData ? {
+            kind: chatData.dataset.kind,
+            id: chatData.dataset.id,
+            name: chatData.dataset.name,
+            email: chatData.dataset.email
+        } : null;
+
+        let lastFingerprint = '';
+        let pollTimer = null;
+        let pollInFlight = false;
+        let messageRequest = null;
+
+        const chatBox = document.getElementById('chatBox');
+        const replyInput = document.getElementById('replyInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const replyForm = document.getElementById('replyForm');
+        const replyUserId = document.getElementById('replyUserId');
+        const chatStatus = document.getElementById('chatStatus');
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+
+        function setStatus(message, isError = false){
+            if(!chatStatus){
+                return;
+            }
+            chatStatus.textContent = message;
+            chatStatus.classList.toggle('error', isError);
+        }
+
+        function jsonHeaders(){
+            const headers = new Headers({'Content-Type': 'application/json'});
+            if(csrfToken){
+                headers.set('X-CSRF-Token', csrfToken);
+            }
+            return headers;
+        }
+
+        function scrollToLatest(){
+            if(chatBox){
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        }
+
+        function displayMessages(messages){
+            if(!chatBox){
+                return;
+            }
+
+            chatBox.replaceChildren();
+
+            if(!messages.length){
+                const empty = document.createElement('div');
+                empty.className = 'chat-empty';
+                empty.textContent = 'No messages yet.';
+                chatBox.appendChild(empty);
+                return;
+            }
+
+            messages.forEach(function(item){
+                const safeSender = item.sender === 'admin' ? 'admin' : 'user';
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble ' + safeSender;
+
+            const senderName =
+                safeSender === 'admin'
+                    ? 'You (Admin)'
+                    : currentConversation?.kind === 'guest'
+                        ? 'Guest'
+                        : String(item.user_name || 'User');
+
+                const message = document.createElement('div');
+                message.textContent = String(item.message ?? '');
+
+                const meta = document.createElement('div');
+                meta.className = 'meta';
+                meta.textContent = `${senderName} · ${String(item.sent_at ?? '')}`;
+
+                bubble.append(message, meta);
+                chatBox.appendChild(bubble);
+            });
+
+            scrollToLatest();
+        }
+
+        async function fetchMessages(conversation){
+            if(pollInFlight || !conversation?.id){
+                return;
+            }
+            pollInFlight = true;
+            messageRequest?.abort();
+            const controller = new AbortController();
+            messageRequest = controller;
+            try{
+                const endpoint = conversation.kind === 'guest'
+                    ? '/admin/guest-support/' + encodeURIComponent(conversation.id) + '/messages'
+                    : '/admin/support/messages/' + encodeURIComponent(conversation.id);
+                const response = await fetch(endpoint, {
+                    headers: csrfToken ? {'X-CSRF-Token': csrfToken} : {},
+                    cache: 'no-store',
+                    signal: controller.signal
+                });
+                const payload = await response.json().catch(() => ({}));
+                const messages = payload.messages;
+
+                if(!response.ok || !payload.ok || !Array.isArray(messages)){
+                    throw new Error(payload.error || 'Messages could not be refreshed.');
+                }
+
+                if(conversation.id !== currentConversation?.id || conversation.kind !== currentConversation?.kind){
+                    return;
+                }
+
+                const fingerprint = JSON.stringify(messages.map(function(item){
+                    return [item.sender, item.message, item.sent_at, item.user_name];
+                }));
+
+                if(fingerprint !== lastFingerprint){
+                    lastFingerprint = fingerprint;
+                    displayMessages(messages);
+                }
+                if(chatStatus?.classList.contains('error')){
+                    setStatus('');
+                }
+            }
+            catch(error){
+                if(error.name !== 'AbortError'){
+                    console.error('Admin support polling error:', error);
+                    setStatus('Connection interrupted. Messages will refresh automatically.', true);
+                }
+            }
+            finally{
+                if(messageRequest === controller){
+                    messageRequest = null;
+                    pollInFlight = false;
+                }
+            }
+        }
+
+        function beginPolling(conversation){
+            if(pollTimer){
+                clearInterval(pollTimer);
+            }
+
+            lastFingerprint = '';
+            fetchMessages(conversation);
+
+            pollTimer = setInterval(function(){
+                if(!document.hidden){
+                    fetchMessages(conversation);
+                }
+            }, 4000);
+        }
+
+        function showConversation(button){
+            const kind = button.dataset.kind || 'user';
+            const id = kind === 'guest' ? button.dataset.token : button.dataset.uid;
+            const name = button.dataset.name;
+            const email = button.dataset.email;
+
+            document.querySelectorAll('.user-btn').forEach(function(item){
+                item.classList.remove('active');
+                item.setAttribute('aria-pressed', 'false');
+            });
+
+            button.classList.add('active');
+            button.setAttribute('aria-pressed', 'true');
+
+            document.getElementById('chatTitle').textContent = name;
+            document.getElementById('chatSub').textContent = email;
+
+            currentConversation = { kind, id: String(id), name, email };
+            if(replyUserId){
+                replyUserId.value = kind === 'user' ? String(id) : '';
+            }
+            setStatus('');
+            messageRequest?.abort();
+            messageRequest = null;
+            pollInFlight = false;
+            if(chatBox){
+                chatBox.replaceChildren();
+                const loading = document.createElement('div');
+                loading.className = 'chat-empty';
+                loading.textContent = 'Loading messages…';
+                chatBox.appendChild(loading);
+            }
+            beginPolling(currentConversation);
+        }
+
+        async function sendReply(){
+            if(!currentConversation?.id || !replyInput){
+                return;
+            }
+
+            const text = replyInput.value.trim();
+
+            if(!text){
+                return;
+            }
+
+            sendBtn.disabled = true;
+            replyInput.disabled = true;
+            setStatus('Sending reply…');
+
+            try{
+                const endpoint = currentConversation.kind === 'guest'
+                    ? '/admin/guest-support/' + encodeURIComponent(currentConversation.id) + '/reply-ajax'
+                    : '/admin/support/send-ajax';
+                const payload = currentConversation.kind === 'guest'
+                    ? {message: text}
+                    : {user_id: currentConversation.id, message: text};
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: jsonHeaders(),
+                    body: JSON.stringify(payload),
+                    cache: 'no-store'
+                });
+
+                const result = await response.json().catch(() => ({}));
+
+                if(response.ok && result.ok){
+                    replyInput.value = '';
+                    lastFingerprint = '';
+                    await fetchMessages(currentConversation);
+                    setStatus('Reply sent.');
+                }else{
+                    throw new Error(result.error || 'The reply could not be sent.');
+                }
+            }
+            catch(error){
+                console.error('Admin support reply error:', error);
+                setStatus(error.message || 'The reply could not be sent. Please try again.', true);
+            }
+            finally{
+                sendBtn.disabled = false;
+                replyInput.disabled = false;
+
+                if(replyInput){
+                    replyInput.focus();
+                }
+            }
+        }
+
+        if(replyInput){
+            replyInput.addEventListener('keydown', function(event){
+                if(event.key === 'Enter' && !event.shiftKey){
+                    event.preventDefault();
+                    sendReply();
+                }
+            });
+        }
+
+        if(replyForm){
+            replyForm.addEventListener('submit', function(event){
+                event.preventDefault();
+                sendReply();
+            });
+        }
+
+        document.querySelectorAll('.user-btn').forEach(function(button){
+            button.addEventListener('click', function(){
+                showConversation(button);
+            });
+        });
+
+        // Old guest-chat links redirect here with ?guest=<opaque token>.
+        // Open that guest in this same workspace, alongside registered users.
+        const requestedGuest = new URLSearchParams(window.location.search).get('guest');
+        if(requestedGuest){
+            const guestButton = Array.from(document.querySelectorAll('.user-btn')).find(function(button){
+                return button.dataset.kind === 'guest' && button.dataset.token === requestedGuest;
+            });
+            if(guestButton){
+                showConversation(guestButton);
+                window.history.replaceState({}, '', window.location.pathname);
+            }
+        }
+
+        if(currentConversation){
+            beginPolling(currentConversation);
+        }
+
+        window.addEventListener('beforeunload', function(){
+            messageRequest?.abort();
+            if(pollTimer){
+                clearInterval(pollTimer);
+            }
+        });
+    </script>
+
+    <script src="{{ url_for('static', filename='interaction.js', v='20260731-1') }}"></script>
+</body>
+</html>

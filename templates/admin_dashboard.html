@@ -1,0 +1,63 @@
+{% extends "admin_base.html" %}
+
+{% set title = "Administrator Dashboard" %}
+{% set admin_page = "dashboard" %}
+{% set page_title = "Administrator Dashboard" %}
+{% set page_subtitle = "System overview and administrator tools" %}
+
+{% block content %}
+<section class="admin-summary" aria-label="System summary">
+  <article class="admin-card metric">
+    <span>Registered Users</span>
+    <strong>{{ user_count }}</strong>
+    <small>Accounts in the system</small>
+  </article>
+
+  <article class="admin-card metric">
+    <span>Total Detections</span>
+    <strong>{{ total_detections }}</strong>
+    <small>Stored detection results</small>
+  </article>
+
+  <article class="admin-card metric">
+    <span>Supported Emotions</span>
+    <strong>5</strong>
+    <small>Happy, Angry, Sad, Neutral, Surprise</small>
+  </article>
+
+  <article class="admin-card metric">
+    <span>System Status</span>
+    <strong class="ready">Online</strong>
+    <small>CNN model available</small>
+  </article>
+</section>
+
+<section class="admin-content-grid">
+  <article class="admin-card">
+    <h2>User Management</h2>
+    <p>Review the registered user accounts for the emotion-recognition system.</p>
+    <a class="admin-action" href="{{ url_for('admin_users') }}">Open User Management</a>
+  </article>
+
+  <article class="admin-card">
+    <h2>Detection Records</h2>
+    <p>Review stored emotion-detection results, confidence scores, face counts, and timestamps.</p>
+    <a class="admin-action" href="{{ url_for('admin_detection_records') }}">Open Detection Records</a>
+  </article>
+
+  <article class="admin-card">
+    <h2>Support Chats</h2>
+    <p>Respond to registered-user and guest feedback from one support workspace.</p>
+    <a class="admin-action" href="{{ url_for('admin_support') }}">Open Support Chats</a>
+  </article>
+
+  <article class="admin-card">
+    <h2>Model Information</h2>
+    <p>
+      <strong>CNN</strong><br>
+      48 × 48 grayscale input<br>
+      Five emotion output classes
+    </p>
+  </article>
+</section>
+{% endblock %}

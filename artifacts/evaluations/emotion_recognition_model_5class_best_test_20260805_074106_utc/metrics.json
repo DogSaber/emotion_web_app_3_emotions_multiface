@@ -1,0 +1,171 @@
+{
+  "balanced_accuracy": 0.834863794782905,
+  "class_order": [
+    "Happy",
+    "Angry",
+    "Sad",
+    "Neutral",
+    "Surprise"
+  ],
+  "dataset": {
+    "class_counts": {
+      "Angry": 192,
+      "Happy": 559,
+      "Neutral": 184,
+      "Sad": 585,
+      "Surprise": 119
+    },
+    "directory": "C:\\Users\\Asus\\Documents\\emotion_web_app_3_emotions_multiface\\dataset\\split_v2\\test",
+    "folder_names": {
+      "Angry": "Angry",
+      "Happy": "Happy",
+      "Neutral": "Neutral",
+      "Sad": "Sad",
+      "Surprise": "Surprise"
+    },
+    "split_name": "test",
+    "total_samples": 1639
+  },
+  "evaluated_samples": 1639,
+  "input_shape": [
+    48,
+    48,
+    1
+  ],
+  "is_untouched_test_candidate": true,
+  "legacy_contract_assumption": false,
+  "macro_f1": 0.8276294561602727,
+  "macro_precision": 0.8332712492819718,
+  "macro_recall": 0.834863794782905,
+  "metadata_present": true,
+  "model": "C:\\Users\\Asus\\Documents\\emotion_web_app_3_emotions_multiface\\artifacts\\experiments\\cnn_basic_20260805_055256_utc\\emotion_recognition_model_5class_best.h5",
+  "model_metadata": {
+    "architecture": "three_double_convolution_blocks_global_average_pooling",
+    "best_epoch": 31,
+    "best_val_macro_f1": 0.8312174081802368,
+    "class_order": [
+      "Happy",
+      "Angry",
+      "Sad",
+      "Neutral",
+      "Surprise"
+    ],
+    "class_to_index": {
+      "Angry": 1,
+      "Happy": 0,
+      "Neutral": 3,
+      "Sad": 2,
+      "Surprise": 4
+    },
+    "created_at_utc": "2026-08-05T05:52:56+00:00",
+    "dataset": {
+      "train_counts": {
+        "Angry": 898,
+        "Happy": 2611,
+        "Neutral": 857,
+        "Sad": 2730,
+        "Surprise": 556
+      },
+      "train_dir": "C:\\Users\\Asus\\Documents\\emotion_web_app_3_emotions_multiface\\dataset\\split_v2\\train",
+      "train_folder_names": {
+        "Angry": "Angry",
+        "Happy": "Happy",
+        "Neutral": "Neutral",
+        "Sad": "Sad",
+        "Surprise": "Surprise"
+      },
+      "validation_counts": {
+        "Angry": 192,
+        "Happy": 559,
+        "Neutral": 184,
+        "Sad": 585,
+        "Surprise": 119
+      },
+      "validation_dir": "C:\\Users\\Asus\\Documents\\emotion_web_app_3_emotions_multiface\\dataset\\split_v2\\validation",
+      "validation_folder_names": {
+        "Angry": "Angry",
+        "Happy": "Happy",
+        "Neutral": "Neutral",
+        "Sad": "Sad",
+        "Surprise": "Surprise"
+      }
+    },
+    "experiment_directory": "C:\\Users\\Asus\\Documents\\emotion_web_app_3_emotions_multiface\\artifacts\\experiments\\cnn_basic_20260805_055256_utc",
+    "input_shape": [
+      48,
+      48,
+      1
+    ],
+    "model_role": "candidate",
+    "preprocessing": "basic",
+    "random_seed": 42,
+    "schema_version": 1,
+    "status": "training_complete",
+    "tensorflow_version": "2.20.0",
+    "training": {
+      "augmentation": {
+        "brightness": [
+          0.9,
+          1.1
+        ],
+        "height_shift": 0.08,
+        "horizontal_flip": true,
+        "rotation_degrees": 10,
+        "shear": 0.05,
+        "width_shift": 0.08,
+        "zoom": 0.1
+      },
+      "batch_size": 32,
+      "checkpoint_monitor": "val_macro_f1",
+      "class_weights": {
+        "Angry": 1.7042316258351893,
+        "Happy": 0.5861355802374569,
+        "Neutral": 1.7857642940490082,
+        "Sad": 0.5605860805860806,
+        "Surprise": 2.7525179856115107
+      },
+      "epochs_requested": 50,
+      "learning_rate": 0.001
+    },
+    "updated_at_utc": "2026-08-05T07:34:10+00:00"
+  },
+  "model_output_name": "emotion_output",
+  "overall_accuracy": 0.8248932275777914,
+  "partial_debug_evaluation": false,
+  "per_class": {
+    "Angry": {
+      "f1-score": 0.6736842105263158,
+      "precision": 0.5653710247349824,
+      "recall": 0.8333333333333334,
+      "support": 192.0
+    },
+    "Happy": {
+      "f1-score": 0.8880931065353626,
+      "precision": 0.8888888888888888,
+      "recall": 0.8872987477638641,
+      "support": 559.0
+    },
+    "Neutral": {
+      "f1-score": 0.8863636363636364,
+      "precision": 0.9285714285714286,
+      "recall": 0.8478260869565217,
+      "support": 184.0
+    },
+    "Sad": {
+      "f1-score": 0.7913279132791328,
+      "precision": 0.8390804597701149,
+      "recall": 0.7487179487179487,
+      "support": 585.0
+    },
+    "Surprise": {
+      "f1-score": 0.8986784140969163,
+      "precision": 0.9444444444444444,
+      "recall": 0.8571428571428571,
+      "support": 119.0
+    }
+  },
+  "preprocessing": "basic",
+  "weighted_f1": 0.8290127422886243,
+  "weighted_precision": 0.8417011753200455,
+  "weighted_recall": 0.8248932275777914
+}

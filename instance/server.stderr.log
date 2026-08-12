@@ -1,0 +1,17 @@
+WARNING:__main__:SECRET_KEY is not configured. Using a random process-local key for development; sessions will be invalidated whenever the application restarts.
+WARNING:__main__:DB_USER is not configured. Falling back to the legacy local root account. Create a least-privilege MySQL user before deployment.
+2026-07-30 20:41:15.947353: I tensorflow/core/util/port.cc:113] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING:tensorflow:From C:\Users\Asus\Documents\emotion_web_app_3_emotions_multiface\.venv\lib\site-packages\keras\src\losses.py:2976: The name tf.losses.sparse_softmax_cross_entropy is deprecated. Please use tf.compat.v1.losses.sparse_softmax_cross_entropy instead.
+
+INFO:__main__:Loading model from C:\Users\Asus\Documents\emotion_web_app_3_emotions_multiface\emotion_recognition_model_5class.h5 ...
+WARNING:tensorflow:From C:\Users\Asus\Documents\emotion_web_app_3_emotions_multiface\.venv\lib\site-packages\keras\src\backend.py:1398: The name tf.executing_eagerly_outside_functions is deprecated. Please use tf.compat.v1.executing_eagerly_outside_functions instead.
+
+WARNING:tensorflow:From C:\Users\Asus\Documents\emotion_web_app_3_emotions_multiface\.venv\lib\site-packages\keras\src\layers\pooling\max_pooling2d.py:161: The name tf.nn.max_pool is deprecated. Please use tf.nn.max_pool2d instead.
+
+2026-07-30 20:41:24.699473: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE SSE2 SSE3 SSE4.1 SSE4.2 AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+INFO:__main__:Model loaded.
+INFO:__main__:Model output shape: (None, 5)
+WARNING:__main__:Model metadata is not available for C:\Users\Asus\Documents\emotion_web_app_3_emotions_multiface\emotion_recognition_model_5class.h5. Using explicitly configured preprocessing mode legacy.
+INFO:__main__:Starting server on http://127.0.0.1:5000 (UI at /ui, threads=4)
+INFO:waitress:Serving on http://127.0.0.1:5000

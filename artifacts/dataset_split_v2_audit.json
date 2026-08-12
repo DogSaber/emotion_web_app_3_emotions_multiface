@@ -1,0 +1,158 @@
+{
+  "class_order": [
+    "Happy",
+    "Angry",
+    "Sad",
+    "Neutral",
+    "Surprise"
+  ],
+  "counts": {
+    "test": {
+      "Angry": 192,
+      "Happy": 559,
+      "Neutral": 184,
+      "Sad": 585,
+      "Surprise": 119
+    },
+    "train": {
+      "Angry": 898,
+      "Happy": 2611,
+      "Neutral": 857,
+      "Sad": 2730,
+      "Surprise": 556
+    },
+    "validation": {
+      "Angry": 192,
+      "Happy": 559,
+      "Neutral": 184,
+      "Sad": 585,
+      "Surprise": 119
+    }
+  },
+  "duplicates": {
+    "conflicting_label_details": [],
+    "conflicting_label_groups": 0,
+    "cross_split_details": [],
+    "cross_split_groups": 0,
+    "duplicate_file_copies_beyond_first": 0,
+    "duplicate_hash_groups": 0,
+    "within_same_class_split_details": [],
+    "within_same_class_split_groups": 0
+  },
+  "folder_casing_warnings": [],
+  "generated_at_utc": "2026-07-29T23:07:56+00:00",
+  "hashes_calculated": true,
+  "partial_scan": false,
+  "per_class_statistics": {
+    "Angry": {
+      "channels": {
+        "3": 1282
+      },
+      "height": {
+        "max": 3202,
+        "median": 287.0,
+        "min": 125
+      },
+      "images": 1282,
+      "size_bytes": {
+        "max": 2826733,
+        "median": 64352.0,
+        "min": 6910
+      },
+      "width": {
+        "max": 3202,
+        "median": 235.0,
+        "min": 97
+      }
+    },
+    "Happy": {
+      "channels": {
+        "3": 3729
+      },
+      "height": {
+        "max": 2611,
+        "median": 322.0,
+        "min": 12
+      },
+      "images": 3729,
+      "size_bytes": {
+        "max": 1025043,
+        "median": 52124.0,
+        "min": 334
+      },
+      "width": {
+        "max": 2611,
+        "median": 289.0,
+        "min": 8
+      }
+    },
+    "Neutral": {
+      "channels": {
+        "1": 1225
+      },
+      "height": {
+        "max": 48,
+        "median": 48.0,
+        "min": 48
+      },
+      "images": 1225,
+      "size_bytes": {
+        "max": 2190,
+        "median": 1564.0,
+        "min": 901
+      },
+      "width": {
+        "max": 48,
+        "median": 48.0,
+        "min": 48
+      }
+    },
+    "Sad": {
+      "channels": {
+        "3": 3900
+      },
+      "height": {
+        "max": 4414,
+        "median": 360.0,
+        "min": 104
+      },
+      "images": 3900,
+      "size_bytes": {
+        "max": 7755325,
+        "median": 58200.5,
+        "min": 5697
+      },
+      "width": {
+        "max": 4414,
+        "median": 326.0,
+        "min": 70
+      }
+    },
+    "Surprise": {
+      "channels": {
+        "1": 794
+      },
+      "height": {
+        "max": 48,
+        "median": 48.0,
+        "min": 48
+      },
+      "images": 794,
+      "size_bytes": {
+        "max": 2313,
+        "median": 1621.0,
+        "min": 839
+      },
+      "width": {
+        "max": 48,
+        "median": 48.0,
+        "min": 48
+      }
+    }
+  },
+  "read_only": true,
+  "total_files_inspected": 10930,
+  "unreadable_details": [],
+  "unreadable_images": 0,
+  "valid_images": 10930
+}

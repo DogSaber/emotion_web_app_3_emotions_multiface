@@ -1,0 +1,15 @@
+-- Copy this file to create_app_user.local.sql, replace both password
+-- placeholders with the same strong password, and run it as a MySQL
+-- administrator. Do not commit the local copy.
+
+CREATE USER IF NOT EXISTS 'emotion_app'@'localhost'
+IDENTIFIED BY 'REPLACE_WITH_A_STRONG_DATABASE_PASSWORD';
+
+ALTER USER 'emotion_app'@'localhost'
+IDENTIFIED BY 'REPLACE_WITH_A_STRONG_DATABASE_PASSWORD';
+
+GRANT SELECT, INSERT, UPDATE, DELETE
+ON emosense.*
+TO 'emotion_app'@'localhost';
+
+FLUSH PRIVILEGES;

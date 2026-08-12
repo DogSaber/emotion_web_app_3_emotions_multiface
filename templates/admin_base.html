@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>{{ title|default('Administrator') }} — Emotion Recognition</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='admin.css', v='20260730-1') }}">
+  <style>
+    button, a[href]{transition:transform .16s ease,box-shadow .16s ease,background-color .16s ease,border-color .16s ease,filter .16s ease}
+    button:not(:disabled):hover, a[href]:hover{transform:translateY(-1px)}
+    button:not(:disabled):active, a[href].is-pressed{transform:translateY(1px);filter:brightness(.96)}
+    button:focus-visible, a[href]:focus-visible{outline:3px solid #8fb4ff;outline-offset:3px}
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  <a class="skip-link" href="#mainContent">Skip to main content</a>
+  <div class="admin-app-shell">
+    <aside class="admin-sidebar" id="adminSidebar" aria-label="Administrator navigation">
+      <div class="admin-brand">
+        <div class="admin-brand-mark" aria-hidden="true"><span class="admin-brand-face">◡</span></div>
+        <div><strong>Emotion Recognition</strong><span>Administrator</span></div>
+      </div>
+      <nav class="admin-side-nav" aria-label="Administrator navigation">
+        <a class="{{ 'active' if admin_page == 'dashboard' else '' }}" href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+        <a class="{{ 'active' if admin_page == 'users' else '' }}" href="{{ url_for('admin_users') }}">User Management</a>
+        <a class="{{ 'active' if admin_page == 'records' else '' }}" href="{{ url_for('admin_detection_records') }}">Detection Records</a>
+        <a class="{{ 'active' if admin_page == 'support' else '' }}" href="{{ url_for('admin_support') }}">Support Chats</a>
+      </nav>
+      <div class="admin-system-card"><strong>System Status</strong><span><i></i> Online</span><p>CNN model ready for administrator monitoring.</p></div>
+      <form action="{{ url_for('admin_logout') }}" method="post" class="admin-logout-form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit">↪ <span>Log out</span></button></form>
+    </aside>
+    <button class="admin-sidebar-backdrop" id="adminSidebarBackdrop" type="button" aria-label="Close navigation" hidden></button>
+    <main class="admin-main-content" id="mainContent" tabindex="-1">
+      <header class="admin-topbar"><button class="admin-menu-btn" id="adminMenuBtn" type="button" aria-label="Open navigation" aria-controls="adminSidebar" aria-expanded="false">☰</button><div><h1>{{ page_title }}</h1><p>{{ page_subtitle }}</p></div><div class="admin-user-chip"><span aria-hidden="true">{{ (name or 'A')[0]|upper }}</span>{{ name or 'Administrator' }}</div></header>
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+  <script src="{{ url_for('static', filename='admin.js', v='20260730-1') }}"></script>
+  <script src="{{ url_for('static', filename='interaction.js', v='20260731-1') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

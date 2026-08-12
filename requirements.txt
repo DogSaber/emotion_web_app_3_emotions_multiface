@@ -1,0 +1,10 @@
+flask==3.0.0
+waitress==2.1.2
+tensorflow==2.15.0
+opencv-python==4.9.0.80
+numpy==1.26.4
+mysql-connector-python==8.3.0
+Flask-Bcrypt==1.0.1
+python-dotenv==1.0.1
+h5py==3.10.0
+scikit-learn==1.7.2

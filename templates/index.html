@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
+    <title>Emotion Recognition — User Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css', v='20260730-3') }}" />
+    <style>
+        button, a[href]{transition:transform .16s ease,box-shadow .16s ease,background-color .16s ease,border-color .16s ease,filter .16s ease}
+        button:not(:disabled):hover, a[href]:hover{transform:translateY(-1px)}
+        button:not(:disabled):active, a[href].is-pressed{transform:translateY(1px);filter:brightness(.96)}
+        button:focus-visible, a[href]:focus-visible{outline:3px solid #8fb4ff;outline-offset:3px}
+    </style>
+</head>
+<body data-user-name="{{ name or ('Guest' if guest_mode else 'User') }}" data-guest-mode="{{ 'true' if guest_mode else 'false' }}" data-guest-fresh="{{ 'true' if guest_fresh|default(false) else 'false' }}">
+    <a class="skip-link" href="#mainContent">Skip to main content</a>
+
+    <div class="app-shell">
+        <aside class="sidebar" id="sidebar" aria-label="User sidebar">
+            <div class="brand-block">
+                <div class="brand-mark" aria-hidden="true"><span class="brand-face">◡</span></div>
+                <div><strong>Emotion Recognition</strong><span>Emotion Detection</span></div>
+            </div>
+
+            <nav class="side-nav" aria-label="{{ 'Guest' if guest_mode else 'User' }} navigation">
+                <button class="nav-item sidebar-link active" id="nav-dashboard" type="button"
+                        data-section="dashboard" aria-controls="dashboard" aria-current="page">
+                    <span class="nav-icon" aria-hidden="true">⌂</span><span>Dashboard</span>
+                </button>
+                <button class="nav-item sidebar-link" id="nav-live-detection" type="button"
+                        data-section="live-detection" aria-controls="live-detection">
+                    <span class="nav-icon" aria-hidden="true">◉</span><span>Live Detection</span>
+                </button>
+                <button class="nav-item sidebar-link" id="nav-history" type="button"
+                        data-section="history" aria-controls="history">
+                    <span class="nav-icon" aria-hidden="true">↺</span><span>History</span>
+                </button>
+                <button class="nav-item sidebar-link" id="nav-analytics" type="button"
+                        data-section="analytics" aria-controls="analytics">
+                    <span class="nav-icon" aria-hidden="true">▥</span><span>Analytics</span>
+                </button>
+                <button class="nav-item sidebar-link" id="nav-settings" type="button"
+                        data-section="settings" aria-controls="settings">
+                    <span class="nav-icon" aria-hidden="true">⚙</span><span>Settings</span>
+                </button>
+                {% if guest_mode %}
+                    <a href="/guest/support" class="nav-item">
+                        <span class="nav-icon" aria-hidden="true">?</span><span>Guest Support</span>
+                    </a>
+                {% else %}
+                    <a href="/support" class="nav-item">
+                        <span class="nav-icon" aria-hidden="true">?</span><span>Support</span>
+                    </a>
+                {% endif %}
+            </nav>
+
+            <div class="system-card" aria-label="System status">
+                <div class="system-title">System Status</div>
+                <div class="status-line"><span class="status-dot" aria-hidden="true"></span> Online</div>
+                <p>CNN model ready for real-time emotion detection.</p>
+            </div>
+
+            <form action="{{ '/guest/exit' if guest_mode else '/logout' }}" method="post" class="logout-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <button type="submit" class="logout-link"><span aria-hidden="true">↪</span><span>{{ 'Exit Guest Mode' if guest_mode else 'Log out' }}</span></button>
+            </form>
+        </aside>
+
+        <button class="sidebar-backdrop" id="sidebarBackdrop" type="button" aria-label="Close navigation menu" hidden></button>
+
+        <main class="main-content" id="mainContent" tabindex="-1">
+            <header class="topbar">
+                <button class="menu-btn" id="menuBtn" type="button" aria-label="Open navigation menu"
+                        aria-controls="sidebar" aria-expanded="false">☰</button>
+                <div class="page-heading">
+                    <h1 id="pageTitle">Dashboard</h1>
+                    <p id="pageSubtitle">Overview of your emotion-detection session</p>
+                </div>
+                <div class="topbar-user">
+                    <time class="date-chip" id="dateTimeChip">—</time>
+                    <div class="user-chip" aria-label="{{ 'Guest user' if guest_mode else 'Signed-in user' }}">
+                        <span class="user-avatar" id="userAvatar" aria-hidden="true">{{ (name or ('G' if guest_mode else 'U'))[0]|upper }}</span>
+                        <span id="userChipName">{{ name or ('Guest' if guest_mode else 'User') }}</span>
+                    </div>
+                </div>
+            </header>
+
+            <section class="page-section active" id="dashboard" aria-labelledby="nav-dashboard">
+                <div class="welcome-banner">
+                    <div>
+                        <span class="eyebrow">{{ 'Guest access' if guest_mode else 'Welcome back' }}</span>
+                        <h2 id="greetingName">Hello, {{ name or ('Guest' if guest_mode else 'User') }}</h2>
+                        <p>{{ 'Use live detection without an account. You can choose whether results stay only in this session or are saved in this browser.' if guest_mode else 'Use live detection to analyze your facial expression in real time.' }}</p>
+                        {% if guest_mode %}
+                        <label class="guest-name-entry" for="guestName">
+                            <span>Optional display name</span>
+                            <input id="guestName" type="text" maxlength="100" autocomplete="name" placeholder="For example, Ellen">
+                        </label>
+                        {% endif %}
+                    </div>
+                    <button class="btn btn-primary" type="button" data-open-section="live-detection">
+                        Open Live Detection
+                    </button>
+                </div>
+
+                <section class="summary-grid" aria-label="Detection overview">
+                    <article class="summary-card accent-card">
+                        <span class="summary-label">Latest Emotion</span>
+                        <strong id="dashboardEmotion">Waiting</strong>
+                        <small>Most recent CNN result</small>
+                    </article>
+                    <article class="summary-card">
+                        <span class="summary-label">Confidence</span>
+                        <strong id="dashboardConfidence">—</strong>
+                        <small>Latest confidence score</small>
+                    </article>
+                    <article class="summary-card">
+                        <span class="summary-label">Session Detections</span>
+                        <strong id="dashboardCount">0</strong>
+                        <small>Results recorded this session</small>
+                    </article>
+                    <article class="summary-card">
+                        <span class="summary-label">Camera Status</span>
+                        <strong id="dashboardCamera">Inactive</strong>
+                        <small>Live detection availability</small>
+                    </article>
+                </section>
+
+                <div class="dashboard-grid">
+                    <article class="panel dashboard-card">
+                        <div class="panel-heading">
+                            <div><span class="eyebrow">Quick start</span><h2>Begin Detection</h2></div>
+                        </div>
+                        <p>Open the live-detection workspace and allow camera access. Detection begins automatically, and your result uses the displayed name and CNN classification.</p>
+                        <button class="btn btn-success" type="button" data-open-section="live-detection">Start Now</button>
+                    </article>
+                    <article class="panel dashboard-card" aria-live="polite">
+                        <div class="panel-heading">
+                            <div><span class="eyebrow">Latest result</span><h2 id="dashboardSentence">No expression detected yet</h2></div>
+                        </div>
+                        <p id="dashboardResultHint">Your latest result will appear here after live detection begins.</p>
+                    </article>
+                </div>
+            </section>
+
+            <section class="page-section" id="live-detection" aria-labelledby="nav-live-detection" hidden>
+                <div class="live-workspace">
+                    <article class="panel camera-panel">
+                        <div class="panel-heading">
+                            <div>
+                                <span class="eyebrow"><span class="live-dot" aria-hidden="true"></span> Live camera</span>
+                                <h2>Real-Time Facial Emotion Detection</h2>
+                            </div>
+                            <span class="camera-badge" id="cameraBadge" aria-live="polite">Camera Off</span>
+                        </div>
+
+                        <div class="camera-stage" id="cameraStage" aria-busy="false">
+                            <video id="video" playsinline autoplay muted aria-label="Live webcam preview"></video>
+                            <canvas id="canvas" width="640" height="480" hidden></canvas>
+                            <canvas id="faceOverlay" class="face-overlay" aria-hidden="true" hidden></canvas>
+                            <div class="camera-placeholder" id="cameraPlaceholder">
+                                <div class="placeholder-icon" aria-hidden="true">◉</div>
+                                <h3>Camera is not active</h3>
+                                <p>Open the camera, then start live detection.</p>
+                            </div>
+                            <div class="detection-overlay" id="detectionOverlay" hidden>
+                                <span class="pulse-dot" aria-hidden="true"></span>
+                                <span>Analyzing facial expression…</span>
+                            </div>
+                        </div>
+
+                        <div class="camera-actions" aria-label="Camera controls">
+                            <button id="openCam" class="btn btn-primary" type="button">Open Camera</button>
+                            <button id="startLiveBtn" class="btn btn-success" type="button" disabled>Start Detection</button>
+                            <button id="stopLiveBtn" class="btn btn-outline" type="button" disabled>Stop Detection</button>
+                            <button id="closeCam" class="btn btn-ghost" type="button" disabled>Close Camera</button>
+                        </div>
+                    </article>
+
+                    <aside class="panel compact-result-panel" aria-labelledby="liveResultHeading">
+                        <div>
+                            <span class="eyebrow">Current result</span>
+                            <h2 id="liveResultHeading">CNN Detection Result</h2>
+                        </div>
+
+                        <div class="identity-result" id="identityResult" aria-live="polite" aria-atomic="true">
+                            <span class="identity-label">Live result</span>
+                            <strong id="namedEmotionResult">{{ name or 'User' }} is waiting for detection</strong>
+                        </div>
+
+                        <dl class="result-details">
+                            <div><dt>Emotion</dt><dd id="resultLabel">—</dd></div>
+                            <div><dt>Confidence</dt><dd id="confidenceValue">—</dd></div>
+                            <div><dt>Number of faces</dt><dd id="resultFaces">0</dd></div>
+                            <div><dt>Detection time</dt><dd id="resultTime">—</dd></div>
+                        </dl>
+
+                        <p id="resultMeta" class="result-message" role="status" aria-live="polite">
+                            Open the camera to begin live detection.
+                        </p>
+                    </aside>
+                </div>
+            </section>
+
+            <section class="page-section" id="history" aria-labelledby="nav-history" hidden>
+                <section class="panel history-panel">
+                    <div class="panel-heading">
+                        <div><span class="eyebrow">Detection records</span><h2>Detection History</h2></div>
+                        <button id="refreshHistory" class="text-btn" type="button">Refresh records</button>
+                    </div>
+                    <p class="section-note" id="historyDescription" role="status" aria-live="polite">Loading your saved detection records…</p>
+                    <div class="table-wrap" role="region" aria-label="Detection history" tabindex="0">
+                        <table>
+                            <thead>
+                                <tr><th scope="col">Time</th><th scope="col">User</th><th scope="col">Detected Result</th><th scope="col">Confidence</th><th scope="col">Faces</th></tr>
+                            </thead>
+                            <tbody id="detectionLog">
+                                <tr id="emptyLog"><td colspan="5" class="empty-cell">Loading detection records…</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </section>
+
+            <section class="page-section" id="analytics" aria-labelledby="nav-analytics" hidden>
+                <section class="analytics-grid" aria-label="Detection analytics">
+                    <article class="summary-card accent-card">
+                        <span class="summary-label">Total Saved Results</span><strong id="analyticsTotal">0</strong>
+                        <small>Detection records in your account</small>
+                    </article>
+                    <article class="summary-card">
+                        <span class="summary-label">Average Confidence</span><strong id="analyticsAverage">—</strong>
+                        <small>Mean confidence across saved records</small>
+                    </article>
+                    <article class="summary-card">
+                        <span class="summary-label">Latest Saved Emotion</span><strong id="analyticsLatest">Waiting</strong>
+                        <small>Most recent account detection</small>
+                    </article>
+                    <article class="summary-card">
+                        <span class="summary-label">Latest Faces</span><strong id="analyticsFaces">0</strong>
+                        <small>Faces in the latest saved detection</small>
+                    </article>
+                </section>
+                <article class="panel analytics-note">
+                    <span class="eyebrow">Analytics</span>
+                    <h2>Detection Performance</h2>
+                    <p id="analyticsDescription">This page summarizes your saved detection activity using simple account-level metrics.</p>
+                </article>
+            </section>
+
+            <section class="page-section" id="settings" aria-labelledby="nav-settings" hidden>
+                <article class="panel settings-panel">
+                    <div class="panel-heading">
+                        <div><span class="eyebrow">Preferences</span><h2>Live Detection Settings</h2></div>
+                    </div>
+                    <div class="settings-grid">
+                        <label class="setting-field" for="detectionInterval">
+                            <span>Detection interval</span>
+                            <select id="detectionInterval">
+                                <option value="1000">Every 1 second</option>
+                                <option value="1500" selected>Every 1.5 seconds</option>
+                                <option value="2000">Every 2 seconds</option>
+                                <option value="3000">Every 3 seconds</option>
+                            </select>
+                        </label>
+                        <label class="setting-field" for="cameraQuality">
+                            <span>Camera quality</span>
+                            <select id="cameraQuality">
+                                <option value="640x480">Standard — 640 × 480</option>
+                                <option value="1280x720" selected>HD — 1280 × 720</option>
+                            </select>
+                        </label>
+                        {% if guest_mode %}
+                        <label class="toggle-field" for="saveGuestResults">
+                            <input id="saveGuestResults" type="checkbox">
+                            <span>
+                                <strong>Save guest results on this device</strong>
+                                <small>Saved results remain only in this browser for your next visit. They are not stored in the system database.</small>
+                            </span>
+                        </label>
+                        {% endif %}
+                        <label class="toggle-field" for="showFaceBoxes">
+                            <input id="showFaceBoxes" type="checkbox" checked>
+                            <span>
+                                <strong>Show face boxes and labels</strong>
+                                <small>Temporary live-preview option. It does not change saved detection records.</small>
+                            </span>
+                        </label>
+                    </div>
+                    {% if guest_mode %}
+                    <button id="deleteGuestResults" class="btn btn-outline guest-delete-btn" type="button">Delete all guest results from this device</button>
+                    {% endif %}
+                    <p id="settingsStatus" class="privacy-note" role="status" aria-live="polite">
+                        Settings apply to this browser. Close and reopen an active camera after changing camera quality.
+                    </p>
+                </article>
+            </section>
+        </main>
+    </div>
+
+    <noscript>
+        <div class="noscript-notice">JavaScript is required for camera detection and dashboard navigation.</div>
+    </noscript>
+    <script src="{{ url_for('static', filename='app.js', v='20260730-3') }}" defer></script>
+    <script src="{{ url_for('static', filename='interaction.js', v='20260731-1') }}" defer></script>
+</body>
+</html>

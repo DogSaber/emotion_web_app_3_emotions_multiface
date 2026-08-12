@@ -1,0 +1,52 @@
+{% extends "admin_base.html" %}
+
+{% set title = "User Management" %}
+{% set admin_page = "users" %}
+{% set page_title = "User Management" %}
+{% set page_subtitle = "Registered user accounts" %}
+
+{% block content %}
+<section class="admin-card admin-page-card">
+  <div class="panel-head">
+    <div>
+      <h2>Registered Users</h2>
+      <span>
+        {{ users|length }} total account{{ '' if users|length == 1 else 's' }}
+      </span>
+    </div>
+  </div>
+
+  <div class="table-region" role="region" aria-label="Registered users" tabindex="0">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">User ID</th>
+          <th scope="col">Name</th>
+          <th scope="col">Email</th>
+          <th scope="col">Date Registered</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+        <tr>
+          <td>{{ user.user_id }}</td>
+          <td><strong>{{ user.name }}</strong></td>
+          <td>{{ user.email }}</td>
+          <td>
+            {% if user.created_at %}
+              {{ user.created_at.strftime('%b %d, %Y') }}
+            {% else %}
+              —
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="4" class="empty">No registered users yet.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

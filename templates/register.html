@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register — Emotion Recognition</title>
+
+    <style>
+        :root {
+            --bg: #f4f7fb;
+            --panel: #ffffff;
+            --panel-alt: #f8fbff;
+            --text: #172033;
+            --muted: #64748b;
+            --line: #dce7f3;
+            --blue: #295bff;
+            --blue-strong: #1741be;
+            --shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+            background-color: var(--bg);
+            background-image: linear-gradient(rgba(244,247,251,0.05), rgba(237,245,255,0.05)), url('/static/auth-bg.jpg');
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .auth-shell {
+            width: min(480px, 100%);
+            max-width: 480px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            align-items: stretch;
+            margin: 0 auto;
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 440px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.96);
+            border: 1px solid rgba(226,232,240,0.95);
+            border-radius: 24px;
+            padding: 28px 24px;
+            box-shadow: 0 30px 80px rgba(15, 23, 42, 0.12);
+            backdrop-filter: saturate(180%) blur(18px);
+        }
+
+        .auth-card h2 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 0.35rem;
+        }
+
+        .auth-card .sub {
+            font-size: 0.95rem;
+            color: var(--muted);
+            margin-bottom: 1.25rem;
+            line-height: 1.55;
+        }
+
+        .field-group {
+            margin-bottom: 0.95rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #334155;
+            margin-bottom: 0.4rem;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            border: 1px solid #d8e3f0;
+            border-radius: 12px;
+            padding: 0.8rem 0.95rem;
+            font-size: 0.95rem;
+            color: var(--text);
+            background: var(--panel-alt);
+            outline: none;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+        }
+
+        input:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 4px rgba(41, 91, 255, 0.12);
+            background: #ffffff;
+        }
+
+        .password-help {
+            margin: -0.3rem 0 0.95rem;
+            color: #64748b;
+            font-size: 0.82rem;
+        }
+
+        .btn-submit {
+            width: 100%;
+            background: linear-gradient(135deg, var(--blue), var(--blue-strong));
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            box-shadow: 0 12px 24px rgba(41, 91, 255, 0.24);
+            margin-top: 0.2rem;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 14px 26px rgba(41, 91, 255, 0.28);
+        }
+
+        .msg {
+            font-size: 0.9rem;
+            padding: 0.75rem 0.9rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .msg.error {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        .links {
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.94rem;
+            color: var(--muted);
+        }
+
+        .links a {
+            color: var(--blue);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .links a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 900px) {
+            .auth-shell {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 14px;
+            }
+
+            .auth-card {
+                padding: 24px 20px;
+                border-radius: 18px;
+            }
+
+            .auth-hero {
+                padding: 24px 20px;
+                border-radius: 18px;
+            }
+
+            input[type="text"],
+            input[type="email"],
+            input[type="password"] {
+                min-height: 44px;
+                font-size: 16px;
+            }
+
+            .btn-submit {
+                min-height: 44px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="auth-shell">
+        <section class="auth-card" aria-labelledby="registerTitle">
+            <h2 id="registerTitle">Create an account</h2>
+            <p class="sub">Fill in the details below to register.</p>
+
+            {% if error %}
+                <div class="msg error" role="alert">{{ error }}</div>
+            {% endif %}
+
+            <form method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+                <div class="field-group">
+                    <label for="name">Full Name</label>
+                    <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        placeholder="Juan dela Cruz"
+                        autocomplete="name"
+                        minlength="2"
+                        maxlength="100"
+                        required />
+                </div>
+
+                <div class="field-group">
+                    <label for="email">Email Address</label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="you@email.com"
+                        autocomplete="email"
+                        maxlength="100"
+                        required />
+                </div>
+
+                <div class="field-group">
+                    <label for="password">Password</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Create a password"
+                        autocomplete="new-password"
+                        minlength="8"
+                        maxlength="72"
+                        aria-describedby="passwordHelp"
+                        required />
+                    <p id="passwordHelp" class="password-help">Use 8–72 characters.</p>
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    Create Account
+                </button>
+
+            </form>
+
+            <div class="links">
+                Already have an account?
+                <a href="/login">Log in here</a>
+            </div>
+
+        </section>
+
+    </div>
+
+</body>
+</html>

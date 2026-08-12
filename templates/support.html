@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
+    <title>Support — Emotion Recognition</title>
+
+    <style>
+        button, a[href]{transition:transform .16s ease,box-shadow .16s ease,background-color .16s ease,border-color .16s ease,filter .16s ease;}
+        button:not(:disabled):hover, a[href]:hover{transform:translateY(-1px);}
+        button:not(:disabled):active, a[href].is-pressed{transform:translateY(1px);filter:brightness(.96);}
+        button:focus-visible, a[href]:focus-visible{outline:3px solid #8fb4ff;outline-offset:3px;}
+        *{
+            box-sizing:border-box;
+            margin:0;
+            padding:0;
+        }
+
+        body{
+            font-family:ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+            background:#f6f7fb;
+            color:#111827;
+            min-height:100vh;
+        }
+
+        header{
+            background:#fff;
+            border-bottom:1px solid #e5e7eb;
+            padding:14px 24px;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            flex-wrap:wrap;
+            gap:8px;
+        }
+
+        header h1{
+            font-size:18px;
+            font-weight:700;
+        }
+
+        .nav{
+            display:flex;
+            align-items:center;
+            gap:12px;
+        }
+
+        .nav a{
+            font-size:13px;
+            color:#6b7280;
+            text-decoration:none;
+        }
+
+        .nav a:hover{
+            color:#111827;
+        }
+
+        .return-link{
+            border:1px solid rgba(255,255,255,.24);
+            background:rgba(255,255,255,.08);
+            color:#fff;
+            border-radius:7px;
+            padding:0.3rem 0.8rem;
+            font-weight:600;
+            display:inline-flex;
+            align-items:center;
+            margin-top:8px;
+            text-decoration:none;
+            font-size:13px;
+        }
+
+        .return-link:hover{
+            background:rgba(255,255,255,.16);
+            color:#fff;
+        }
+
+        .return-bar{
+            max-width:760px;
+            margin:0 auto;
+            padding:14px 1rem 0;
+        }
+
+        .return-bar .return-link{
+            margin-top:0;
+            background:#fff;
+            border-color:#cbd7e7;
+            color:#21456e;
+        }
+
+        .return-bar .return-link:hover{
+            background:#edf4ff;
+            color:#173b65;
+        }
+
+        .nav .logout{
+            background:#f3f4f6;
+            border:1px solid #e5e7eb;
+            padding:0.3rem 0.8rem;
+            border-radius:7px;
+            color:#374151;
+            cursor:pointer;
+            font:inherit;
+        }
+
+        .nav form{
+            margin:0;
+        }
+
+        .container{
+            max-width:720px;
+            width:100%;
+            margin:2rem auto;
+            padding:0 1rem;
+        }
+
+        .card{
+            background:#fff;
+            border:1px solid #e5e7eb;
+            border-radius:14px;
+            padding:1.5rem;
+            display:flex;
+            flex-direction:column;
+            box-shadow:0 1px 2px rgba(0,0,0,0.04);
+        }
+
+        .chat-header{
+            margin-bottom:1rem;
+            padding-bottom:0.8rem;
+            border-bottom:1px solid #f3f4f6;
+        }
+
+        .chat-header h2{
+            font-size:15px;
+            font-weight:700;
+            color:#111827;
+        }
+
+        .chat-sub{
+            font-size:12px;
+            color:#9ca3af;
+            margin-top:2px;
+        }
+
+        .chat-box{
+            min-height:320px;
+            max-height:420px;
+            overflow-y:auto;
+            display:flex;
+            flex-direction:column;
+            gap:8px;
+            margin-bottom:1rem;
+            padding:4px 2px;
+        }
+
+        .chat-box::-webkit-scrollbar{
+            width:4px;
+        }
+
+        .chat-box::-webkit-scrollbar-thumb{
+            background:#d1d5db;
+            border-radius:4px;
+        }
+
+        .bubble{
+            max-width:72%;
+            padding:0.55rem 0.9rem;
+            border-radius:12px;
+            font-size:13px;
+            line-height:1.55;
+            word-break:break-word;
+        }
+
+        .bubble.user{
+            background:#111827;
+            color:#fff;
+            align-self:flex-end;
+            border-bottom-right-radius:3px;
+        }
+
+        .bubble.admin{
+            background:#f3f4f6;
+            color:#111827;
+            align-self:flex-start;
+            border-bottom-left-radius:3px;
+            border:1px solid #e5e7eb;
+        }
+
+        .bubble .meta{
+            font-size:11px;
+            margin-top:4px;
+            opacity:0.6;
+        }
+
+        .chat-empty{
+            text-align:center;
+            color:#9ca3af;
+            font-size:13px;
+            margin:auto;
+            padding:2rem 0;
+        }
+
+        .reply-row{
+            display:flex;
+            gap:8px;
+            border-top:1px solid #f3f4f6;
+            padding-top:1rem;
+        }
+
+        textarea{
+            flex:1;
+            border:1px solid #d1d5db;
+            border-radius:8px;
+            padding:0.6rem 0.8rem;
+            font-size:13px;
+            resize:none;
+            height:44px;
+            outline:none;
+            font-family:inherit;
+            background:#fafafa;
+            transition:border-color 0.15s;
+            color:#111827;
+        }
+
+        textarea:focus{
+            border-color:#111827;
+            background:#fff;
+        }
+
+        .btn-send{
+            background:#111827;
+            color:#fff;
+            border:none;
+            border-radius:8px;
+            padding:0 1.2rem;
+            font-size:13px;
+            font-weight:600;
+            cursor:pointer;
+            white-space:nowrap;
+            transition:background 0.15s;
+        }
+
+        .btn-send:hover{
+            background:#1f2937;
+        }
+
+        .btn-send:disabled{
+            opacity:0.5;
+            cursor:not-allowed;
+        }
+
+        .chat-status{
+            min-height:18px;
+            margin-top:8px;
+            color:#6b7280;
+            font-size:12px;
+        }
+
+        .chat-status.error{
+            color:#b42318;
+        }
+
+        .sr-only{
+            position:absolute;
+            width:1px;
+            height:1px;
+            padding:0;
+            margin:-1px;
+            overflow:hidden;
+            clip:rect(0, 0, 0, 0);
+            white-space:nowrap;
+            border:0;
+        }
+
+        /* Shared dashboard-style chat appearance for registered users and guests. */
+        body{background:#f4f7fb;color:#172033;}
+        header{background:#10243e;border-bottom:0;color:#fff;padding:16px 24px;}
+        header h1{color:#fff;}
+        .nav a{color:#dbe7f5;}
+        .nav a:hover{color:#fff;}
+        .nav .logout{border-color:rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;}
+        .card{border-color:#e2e8f0;border-radius:17px;box-shadow:0 12px 30px rgba(23,32,51,.06);}
+        .chat-header h2{font-size:18px;color:#172033;}
+        .chat-sub{color:#667085;}
+        .bubble.user{background:#10243e;}
+        .bubble.admin{background:#f3f6fa;border-color:#e2e8f0;}
+        .btn-send{background:#2563eb;}
+        .btn-send:hover{background:#1d4ed8;}
+        textarea:focus{border-color:#2563eb;}
+
+        @media (max-width:640px){
+            header{
+                align-items:flex-start;
+                padding:12px 16px;
+            }
+
+            header h1{
+                font-size:16px;
+            }
+
+            .nav{
+                width:100%;
+                justify-content:space-between;
+                gap:8px;
+            }
+
+            .nav a,
+            .nav .logout{
+                min-height:44px;
+                display:inline-flex;
+                align-items:center;
+            }
+
+            .container{
+                margin:1rem auto;
+                padding:0 0.75rem;
+            }
+
+            .card{
+                padding:1rem;
+                border-radius:12px;
+            }
+
+            .chat-box{
+                min-height:260px;
+                height:clamp(260px, 52vh, 420px);
+            }
+
+            .bubble{
+                max-width:88%;
+            }
+
+            textarea{
+                min-height:44px;
+                font-size:16px;
+            }
+
+            .btn-send{
+                min-height:44px;
+            }
+        }
+
+        @media (max-width:420px){
+            .reply-row{
+                flex-direction:column;
+            }
+
+            .btn-send{
+                width:100%;
+                padding:0.7rem 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div>
+            <h1>Emotion Recognition System</h1>
+        </div>
+
+        <div class="nav">
+            <form action="{{ '/guest/exit' if guest_mode else '/logout' }}" method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <button type="submit" class="logout">{{ 'Exit Guest Mode' if guest_mode else 'Log out' }}</button>
+            </form>
+        </div>
+    </header>
+
+    <div class="return-bar">
+        <a class="return-link" href="{{ '/guest' if guest_mode else '/dashboard' }}">← Return to Dashboard</a>
+    </div>
+
+    <div class="container">
+        <div class="card">
+
+            <div class="chat-header">
+                <h2>Support Chat</h2>
+                <div class="chat-sub">
+                    {{ 'Send anonymous feedback to the administrator. Replies stay available in this guest browser.' if guest_mode else 'Send a message to contact the admin. Press Enter to send.' }}
+                </div>
+            </div>
+
+            <div class="chat-box" id="chatBox" role="log" aria-live="polite" aria-relevant="additions text">
+                {% if messages %}
+                    {% for msg in messages %}
+                        <div class="bubble {{ 'user' if msg.sender == 'guest' else msg.sender }}">
+                            {{ msg.message }}
+
+                            <div class="meta">
+                                {% if msg.sender == 'admin' %}
+                                    Admin
+                                {% else %}
+                                    You
+                                {% endif %}
+                                &nbsp;·&nbsp;
+                                {{ msg.sent_at.strftime('%b %d, %H:%M') if msg.sent_at else '' }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="chat-empty" id="emptyMsg">
+                        No messages yet. Send a message below.
+                    </div>
+                {% endif %}
+            </div>
+
+            <form class="reply-row" id="messageForm" action="/support/send" method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <label class="sr-only" for="msgInput">Message for support</label>
+                <textarea id="msgInput" name="message" maxlength="2000"
+                          placeholder="Type your message… (Enter to send)"
+                          aria-describedby="chatStatus" required></textarea>
+                <button class="btn-send" id="sendBtn" type="submit">Send</button>
+            </form>
+            <p class="chat-status{% if load_error %} error{% endif %}" id="chatStatus" role="status" aria-live="polite">{{ load_error or '' }}</p>
+
+        </div>
+    </div>
+
+    <script>
+        const chatArea = document.getElementById('chatBox');
+        const messageField = document.getElementById('msgInput');
+        const sendButton = document.getElementById('sendBtn');
+        const messageForm = document.getElementById('messageForm');
+        const chatStatus = document.getElementById('chatStatus');
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+        const guestMode = {{ 'true' if guest_mode else 'false' }};
+        const supportBase = guestMode ? '/guest/support' : '/support';
+        let pollInFlight = false;
+        let messageFingerprint = '';
+
+        function setStatus(message, isError = false){
+            chatStatus.textContent = message;
+            chatStatus.classList.toggle('error', isError);
+        }
+
+        function requestHeaders(){
+            const headers = new Headers({'Content-Type': 'application/json'});
+            if(csrfToken){
+                headers.set('X-CSRF-Token', csrfToken);
+            }
+            return headers;
+        }
+
+        function moveToBottom(){
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        moveToBottom();
+
+        function createBubble(sender, message, time){
+            const emptyNotice = document.getElementById('emptyMsg');
+
+            if(emptyNotice){
+                emptyNotice.remove();
+            }
+
+            const safeSender = sender === 'admin' ? 'admin' : 'user';
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble ' + safeSender;
+
+            const messageText = document.createElement('div');
+            messageText.textContent = String(message ?? '');
+
+            const meta = document.createElement('div');
+            meta.className = 'meta';
+            const label = safeSender === 'admin' ? 'Admin' : 'You';
+            meta.textContent = `${label} · ${String(time ?? '')}`;
+
+            bubble.append(messageText, meta);
+
+            chatArea.appendChild(bubble);
+            moveToBottom();
+        }
+
+        async function submitMessage(){
+            const text = messageField.value.trim();
+
+            if(!text){
+                return;
+            }
+
+            sendButton.disabled = true;
+            messageField.disabled = true;
+            setStatus('Sending message…');
+
+            try{
+                const response = await fetch(`${supportBase}/send-ajax`, {
+                    method: 'POST',
+                    headers: requestHeaders(),
+                    body: JSON.stringify({
+                        message: text,
+                        guest_name: guestMode ? (sessionStorage.getItem('emotion-recognition:guest:display-name') || '') : undefined
+                    }),
+                    cache: 'no-store'
+                });
+
+                const result = await response.json().catch(() => ({}));
+
+                if(response.ok && result.ok){
+                    const current = new Date();
+
+                    const formattedTime = current.toLocaleString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false
+                    });
+
+                    createBubble('user', text, formattedTime);
+                    messageField.value = '';
+                    setStatus('Message sent.');
+                    previousCount += 1;
+                }else{
+                    throw new Error(result.error || 'The message could not be sent.');
+                }
+            }
+            catch(error){
+                console.error('Support message error:', error);
+                setStatus(error.message || 'The message could not be sent. Please try again.', true);
+            }
+            finally{
+                sendButton.disabled = false;
+                messageField.disabled = false;
+                messageField.focus();
+            }
+        }
+
+        messageField.addEventListener('keydown', function(event){
+            if(event.key === 'Enter' && !event.shiftKey){
+                event.preventDefault();
+                submitMessage();
+            }
+        });
+
+        messageForm.addEventListener('submit', function(event){
+            event.preventDefault();
+            submitMessage();
+        });
+
+        let previousCount = document.querySelectorAll('.bubble').length;
+
+        setInterval(async function(){
+            if(pollInFlight || document.hidden){
+                return;
+            }
+            pollInFlight = true;
+            try{
+                const response = await fetch(`${supportBase}/messages`, {
+                    headers: csrfToken ? {'X-CSRF-Token': csrfToken} : {},
+                    cache: 'no-store'
+                });
+                const payload = await response.json().catch(() => ({}));
+                const messages = payload.messages;
+
+                if(!response.ok || !payload.ok || !Array.isArray(messages)){
+                    throw new Error(payload.error || 'Messages could not be refreshed.');
+                }
+
+                const nextFingerprint = JSON.stringify(messages.map(function(item){
+                    return [item.sender, item.message, item.sent_at];
+                }));
+
+                if(messages.length !== previousCount || nextFingerprint !== messageFingerprint){
+                    previousCount = messages.length;
+                    messageFingerprint = nextFingerprint;
+                    chatArea.replaceChildren();
+
+                    messages.forEach(function(item){
+                        createBubble(item.sender, item.message, item.sent_at);
+                    });
+
+                    if(!messages.length){
+                        const empty = document.createElement('div');
+                        empty.className = 'chat-empty';
+                        empty.id = 'emptyMsg';
+                        empty.textContent = 'No messages yet. Send a message below.';
+                        chatArea.appendChild(empty);
+                    }
+                }
+                if(chatStatus.classList.contains('error')){
+                    setStatus('');
+                }
+            }
+            catch(error){
+                console.error('Support polling error:', error);
+                setStatus('Connection interrupted. Messages will refresh automatically.', true);
+            }
+            finally{
+                pollInFlight = false;
+            }
+        }, 4000);
+    </script>
+
+    <script src="{{ url_for('static', filename='interaction.js', v='20260731-1') }}"></script>
+</body>
+</html>
