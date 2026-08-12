@@ -1,6 +1,6 @@
 flask==3.0.0
 waitress==2.1.2
-tensorflow==2.15.0
+tflite-runtime
 opencv-python-headless
 Pillow
 numpy==1.26.4
